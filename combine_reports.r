@@ -52,9 +52,31 @@ view(all_reports)
 sum(is.na(all_reports))
 
 # Rearrange the table to be more readable
-
 all_reports <- all_reports %>%
   select(status, county, incident_date, prior_status, narrative)
+
+# Identify the county totals
+county_totals <- all_reports %>%
+  group_by(county) %>%
+  summarise(total = n()) %>%
+  arrange(total)
+
+view(county_totals)
+
+# Spot clean incorrect values
+allegheny_fix <- c(1261, 869, 870)
+
+all_reports[allegheny_fix, 2] <- "Allegheny"
+
+cambria_fix <- c(722, 873, 874, 966)
+
+all_reports[cambria_fix, 2] <- "Cambria"
+
+all_reports[562, 2] <- "Delaware"
+
+all_reports[1250, 2] <- "Monroe"
+
+all_reports[1195, 2] <- "Wayne"
 
 # Filter for Philadelphia reports
 phl_reports <- all_reports %>%
@@ -62,10 +84,6 @@ phl_reports <- all_reports %>%
   mutate(year = substr(incident_date, nchar(incident_date) - 3, nchar(incident_date)))
 
 sum(is.na(phl_reports))
-
-county_totals <- all_reports %>%
-  group_by(county) %>%
-  summarise(total = n())
 
 # Graph the timeline of PHL cases
 
